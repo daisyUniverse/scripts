@@ -1,0 +1,20 @@
+#!/bin/python
+
+import sys
+
+name = sys.argv[1]
+seasons = len(sys.argv)-2 # int(sys.argv[2])
+episodes = int(sys.argv[3])
+
+season = 0
+episode = 0
+
+while season < seasons:
+    season = season + 1
+    episode = 0
+    print("[SEASON: " + str(season) + "]")
+    while episode < int(sys.argv[season+1]):
+        episode = episode + 1
+        print(name + " S" + str(season) + " E" + str(episode))
+        
+print("All done!")

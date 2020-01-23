@@ -36,3 +36,19 @@ This ones a bit more complicated as it's a little bit of a multitasker. here are
 and probably some other bits and bobs. This one has a lot of hard-coded directories, so it will take some tweaking to get working on your end, and it kind of relies on an exploit of a website for the audio to work at all, so it could actually just blow up at any moment. use at your own discretion
 
 Needs: **python, twitch, wordfilter, Spotify** (it has to be running before you start the script), **gi, SoX**, probably other stuff. just keep starting it and installing things until it stops complaining lmfao
+
+## tvname
+
+Will generate a list of [Name] [S] [E] names in a list for easy copy and pasting into handbrake. Recommend moving to /usr/bin for easy systemwide use
+
+`tvname "Avatar: The Last Airbender" 20 20 21 > log.txt`
+
+Needs: **Python**
+
+## notify
+
+Will monitor a directory for newly created .m4v files, and when one is spotted, post it to discord to the 'movie-rips' channel with the message "Now Ripping: [filename]" using Discho. Directories are read recursively, so anything below the path specified will be watched
+
+`./notify.sh [PATH]`
+
+Needs: **Python, Discho**
