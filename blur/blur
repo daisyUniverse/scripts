@@ -1,0 +1,3 @@
+#!/bin/bash
+
+xprop | grep "WM_CLASS(STRING)" | awk '{print $NF}' | python blur.py $1
