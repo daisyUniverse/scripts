@@ -1,3 +1,12 @@
 #!/bin/bash
 
-xprop | grep "WM_CLASS(STRING)" | awk '{print $NF}' | python blur.py $1
+if [[ $1 = "install" ]]; 
+    then
+        sudo cp blur /usr/bin/;
+        echo "Copied blur to /usr/bin/";
+        sudo cp blur.py /usr/bin/;
+        echo "Copied blur.py to /usr/bin/";
+        exit;
+fi 
+
+xprop | grep "WM_CLASS(STRING)" | awk '{print $NF}' | python /usr/bin/blur.py $1
