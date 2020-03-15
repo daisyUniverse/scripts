@@ -1,0 +1,72 @@
+#!/bin/sh
+
+clipboard=`xclip -o`	# Grab the contents of the clipboard
+DLDIR="$@" 				# Takes whatever dir was passed to it and sets it to the downloads dir
+
+NAME="${clipboard##*/}" # Get everything past the last /
+EXT="${NAME##*.}"		# Grab the file extension by itself
+NAME="${NAME%.*}"		# Remove the file extension from the filename
+NAME="${NAME////}"		# Remove any possible remaining / chars
+
+download () {			# Function to download plainly named files and place them in whatever folder you'd like (with notification)
+	notify-send "Downloading ${NAME}.$EXT from $clipboard..."
+	[ ! -d "${DLDIR}/$1" ] && echo "Directory ${DLDIR}/$1 does not exist... Attempting to create..." && mkdir "${DLDIR}/$1"
+	wget -q --force-directories --show-progress -cO - $clipboard > "${DLDIR}/$1/${NAME}.$EXT"
+	notify-send "${NAME}.$EXT downloaded to $1" 
+}
+
+case $clipboard in
+	#EXT	           	     #DIR
+	*.png)			download Image	;;
+	*.jpg | *.jpeg)	download Image	;;
+	*.gif)			download Image	;;
+	*.mp4)			download Video	;;
+	*.webm)			download Video	;;
+	*.mp3)			download Audio	;;
+	
+	# Special Cases
+
+	*format=jpg*name=*) # Attempts to fix twitter image links
+		NAME="${NAME%?format=jpg*name=*}"
+		[ ! -d "${DLDIR}/Image" ] && echo "Directory ${DLDIR}/Image does not exist... Attempting to create..." && mkdir "${DLDIR}/Image"
+		notify-send "Downloading ${NAME}.jpg from $clipboard..."
+		wget -q --force-directories --show-progress -cO - $clipboard > "${DLDIR}/Image/${NAME}.jpg"
+		notify-send "${NAME}.jpg downloaded to Images" 
+		;;
+
+	https://www.youtube.com/watch?v=*) # If it's the long version of the youtube URL, download as an MP3 to Audio
+		id=${clipboard#"$https://www.youtube.com/watch?v="}
+		redir='Audio/%(title)s.%(ext)s'
+		notify-send "Downloading Audio from $clipboard..."
+		youtube-dl -x --audio-format mp3 $id -o "${DLDIR}${redir}"
+		notify-send "$clipboard downloaded to Audio"
+		;;
+
+	https://youtu.be/*) # If it's the short version of the youtube URL, download as a video to Video
+		id=${clipboard#"$https://youtu.be/"}
+		redir='Video/%(title)s.%(ext)s'
+		notify-send "Downloading Video from $clipboard..."
+		youtube-dl $id -o "${DLDIR}${redir}"
+		notify-send "$clipboard downloaded to Video"
+		;;
+
+	https://twitter.com*) # Downloads twitter videos
+		redir='Video/%(title)s.%(ext)s'
+		notify-send "Downloading Video from $clipboard..."
+		youtube-dl $clipboard -o "${DLDIR}${redir}"
+		notify-send "$clipboard downloaded to Video"
+		;;
+
+	https://soundcloud.com*) # Grabs soundcloud music
+		redir='Audio/%(title)s.%(ext)s'
+		notify-send "Downloading Audio from $clipboard..."
+		youtube-dl $clipboard -o "${DLDIR}${redir}"
+		notify-send "$clipboard downloaded to Audio"
+		;;
+
+	*)
+		echo "Couldn't find a valid link to download from!"
+		notify-send "Couldn't find a valid link to download from!"
+		;;
+esac 
+
