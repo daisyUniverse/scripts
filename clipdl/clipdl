@@ -1,19 +1,46 @@
 #!/bin/sh
 
-clipboard=`xclip -o`	# Grab the contents of the clipboard
-DLDIR="$@" 				# Takes whatever dir was passed to it and sets it to the downloads dir
+clipboard=`xclip -o`	 # Grab the contents of the clipboard
+DLDIR="$1" 				 # Takes whatever dir was passed to it and sets it to the downloads dir
+OPEN="$2"                # Is there a second arg? if there is, set OPEN to whatever it is
 
-NAME="${clipboard##*/}" # Get everything past the last /
-EXT="${NAME##*.}"		# Grab the file extension by itself
-NAME="${NAME%.*}"		# Remove the file extension from the filename
-NAME="${NAME////}"		# Remove any possible remaining / chars
+NAME="${clipboard##*/}"  # Get everything past the last /
+EXT="${NAME##*.}"		 # Grab the file extension by itself
+NAME="${NAME%.*}"		 # Remove the file extension from the filename
+NAME="${NAME////}"		 # Remove any possible remaining / chars
 
-download () {			# Function to download plainly named files and place them in whatever folder you'd like (with notification)
+download () {			 # Function to download plainly named files and place them in whatever folder you'd like (with notification)
 	notify-send "Downloading ${NAME}.$EXT from $clipboard..."
 	[ ! -d "${DLDIR}/$1" ] && echo "Directory ${DLDIR}/$1 does not exist... Attempting to create..." && mkdir "${DLDIR}/$1"
 	wget -q --force-directories --show-progress -cO - $clipboard > "${DLDIR}/$1/${NAME}.$EXT"
 	notify-send "${NAME}.$EXT downloaded to $1" 
+    
+    case $OPEN in       # Check the args
+        "-o" | "--open") open "$1" "${DLDIR}/$1/${NAME}.$EXT" ;;
+        "-e" | "--edit") edit "$1" "${DLDIR}/$1/${NAME}.$EXT" ;;
+    esac
 }
+
+open() {                # Open the file once it's been downloaded (Change viewer to whatever)
+    case $1 in
+        #FOLDER             #NOTIFICATION MESSAGE     #VIEWER  #PATH  
+        Image) notify-send "Opening image file..." && gthumb   "$2" >/dev/null 2>&1 & disown ;;
+        Video) notify-send "Opening video file..." && vlc      "$2" >/dev/null 2>&1 & disown ;;
+        Audio) notify-send "Opening audio file..." && vlc      "$2" >/dev/null 2>&1 & disown ;;
+        Git)   notify-send "Opening git dir..."    && xdg-open "$2" >/dev/null 2>&1 & disown ;;
+    esac
+}
+
+edit() {                # Open the file in the correct type of editor once it's been downloaded (Change this to whatever)
+    case $1 in
+        #FOLDER             #NOTIFICATION MESSAGE                #EDITOR            #PATH  
+        Image) notify-send "Editing image file..."            && gimp               "$2" >/dev/null 2>&1 & disown  ;;
+        Video) notify-send "Editing video file..."            && kdenlive -i        "$2" >/dev/null 2>&1 & disown  ;;
+        Audio) notify-send "Editing audio file..."            && audacity           "$2" >/dev/null 2>&1 & disown  ;;
+        Git)   notify-send "opening git folder in konsole..." && konsole --workdir  "$2" >/dev/null 2>&1 & disown  ;;
+    esac
+}
+
 
 case $clipboard in
 	#EXT	           	     #DIR
@@ -32,6 +59,11 @@ case $clipboard in
 		notify-send "Downloading ${NAME}.jpg from $clipboard..."
 		wget -q --force-directories --show-progress -cO - $clipboard > "${DLDIR}/Image/${NAME}.jpg"
 		notify-send "${NAME}.jpg downloaded to Images" 
+
+        case $OPEN in
+            "-o" | "--open") open "Image" "${DLDIR}/Image/${NAME}.jpg" ;;
+            "-e" | "--edit") edit "Image" "${DLDIR}/Image/${NAME}.jpg" ;;
+        esac
 		;;
 
 	https://www.youtube.com/watch?v=*) # If it's the long version of the youtube URL, download as an MP3 to Audio
@@ -39,29 +71,71 @@ case $clipboard in
 		redir='Audio/%(title)s.%(ext)s'
 		notify-send "Downloading Audio from $clipboard..."
 		youtube-dl -x --audio-format mp3 $id -o "${DLDIR}${redir}"
-		notify-send "$clipboard downloaded to Audio"
+        name=`youtube-dl $id --get-title`
+		notify-send "$name downloaded to Audio"
+
+        case $OPEN in
+            "-o" | "--open") open "Audio" "${DLDIR}/Audio/${name}.mp3" ;;
+            "-e" | "--edit") edit "Audio" "${DLDIR}/Audio/${name}.mp3" ;;
+        esac
 		;;
 
-	https://youtu.be/*) # If it's the short version of the youtube URL, download as a video to Video
+	https://youtu.be*) # If it's the short version of the youtube URL, download as a video to Video
 		id=${clipboard#"$https://youtu.be/"}
 		redir='Video/%(title)s.%(ext)s'
 		notify-send "Downloading Video from $clipboard..."
-		youtube-dl $id -o "${DLDIR}${redir}"
-		notify-send "$clipboard downloaded to Video"
+		youtube-dl -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' $id -o "${DLDIR}${redir}"
+        name=`youtube-dl $id --get-title`
+        fn=`youtube-dl $id --get-filename`
+        type="${fn##*.}"	
+		notify-send "$name downloaded to Video"
+
+        case $OPEN in
+            "-o" | "--open") open "Video" "${DLDIR}/Video/${name}.mp4" ;;
+            "-e" | "--edit") edit "Video" "${DLDIR}/Video/${name}.mp4" ;;
+        esac
 		;;
 
 	https://twitter.com*) # Downloads twitter videos
 		redir='Video/%(title)s.%(ext)s'
 		notify-send "Downloading Video from $clipboard..."
-		youtube-dl $clipboard -o "${DLDIR}${redir}"
-		notify-send "$clipboard downloaded to Video"
+		youtube-dl -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' $clipboard -o "${DLDIR}${redir}"
+        name=`youtube-dl $clipboard --get-title`
+        fn=`youtube-dl $clipboard --get-filename`
+        type="${fn##*.}"	
+		notify-send "$name downloaded to Video"
+
+        case $OPEN in
+            "-o" | "--open") open "Video" "${DLDIR}/Video/${name}.mp4" ;;
+            "-e" | "--edit") edit "Video" "${DLDIR}/Video/${name}.mp4" ;;
+        esac
 		;;
 
 	https://soundcloud.com*) # Grabs soundcloud music
 		redir='Audio/%(title)s.%(ext)s'
 		notify-send "Downloading Audio from $clipboard..."
 		youtube-dl $clipboard -o "${DLDIR}${redir}"
-		notify-send "$clipboard downloaded to Audio"
+        name=`youtube-dl $clipboard --get-title`
+        fn=`youtube-dl $clipboard --get-filename`
+        type="${fn##*.}"	
+		notify-send "$name downloaded to Audio"
+
+        case $OPEN in
+            "-o" | "--open") open "Audio" "${DLDIR}/Audio/${name}.mp3" ;;
+            "-e" | "--edit") edit "Audio" "${DLDIR}/Audio/${name}.mp3" ;;
+        esac
+		;;
+
+    https://github.com*) # Git Clones from Github
+        redir="Git/${NAME}/"
+		notify-send "Git Cloning from from $clipboard..."
+		git clone $clipboard "${DLDIR}${redir}"
+		notify-send "$clipboard downloaded to Git"
+
+        case $OPEN in
+            "-o" | "--open") open "Git" "${DLDIR}${redir}" ;;
+            "-e" | "--edit") edit "Git" "${DLDIR}${redir}" ;;
+        esac
 		;;
 
 	*)
