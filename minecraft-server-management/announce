@@ -1,0 +1,7 @@
+#!/bin/bash
+
+screen -S release -p 0 -X stuff "say $@^M"
+screen -S beta -p 0 -X stuff "say $@^M"
+screen -S alpha -p 0 -X stuff "say $@^M"
+screen -S classic -p 0 -X stuff "say $@^M"
+screen -S cloth -p 0 -X stuff "say $@^M"

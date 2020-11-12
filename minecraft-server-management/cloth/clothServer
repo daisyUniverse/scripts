@@ -1,0 +1,51 @@
+#!/bin/bash
+
+startServer(){
+    screen -d -m -S cloth java -cp MineOnline.jar gg.codie.mineonline.Server Server.jar -Xms1G -Xmx2G
+}
+
+stopServer(){
+    screen -S cloth -p 0 -X stuff "stop^M"
+}
+
+messageServer(){
+    screen -S cloth -p 0 -X stuff "say $@^M"
+}
+
+restartServer(){
+    stopServer
+    sleep 10s
+    startServer
+}
+
+updateServer(){
+    latest=$(curl -s "https://api.github.com/repos/Luminoso-256/Cloth-Server/releases/latest" | jq -r '.tag_name')
+    current=$(cat CV)
+    
+    if [ "$current" != "$latest" ]
+        then
+            messageServer "Cloth $latest release detected, Restarting in 30 seconds and updating from $current. This may take some time, please rejoin later"
+            sleep 30s
+	    stopServer
+            sleep 10s
+            echo "Detected version difference, updating Cloth version $current to $latest..."
+            sleep 1s
+	    rm Server.jar
+            wget -c "https://github.com/Luminoso-256/Cloth-Server/releases/download/$latest/Server.jar"
+            chmod +x Server.jar
+            echo $latest > CV
+            echo "Cloth updated to version: $latest"
+            startServer
+        else
+            echo "You already have the latest version: $current"
+	    messageServer "You are currently on Dominae Cloth running Cloth $current"
+    fi
+    
+}
+
+case $1 in # Check args
+    "-r" | "--restart"  ) restartServer	;;
+    "-u" | "--update"   ) updateServer	;;
+    "-q" | "--stop"     ) stopServer	;;
+    "-s" | "--start"    ) startServer	;;
+esac
