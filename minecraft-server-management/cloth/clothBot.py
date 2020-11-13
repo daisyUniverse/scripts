@@ -14,7 +14,9 @@ commands = { # Command names, change these to change the command trigger
     "update"   : "update",
     "stop"     : "stop",
     "wipe"     : "wipe",
-    "announce" : "announce"
+    "announce" : "announce",
+    "config"   : "config",
+    "help"     : "help"
 }
 
 allowedUsers = ["128423195366785024","719545123096231956"]
@@ -78,6 +80,44 @@ class MyClient(discord.Client):
                         await log(commands['announce'] + " command used", str(message.author), "LOW")
                         await message.channel.send("Updating the Cloth server...")
                         os.system('bash clothServer -a "' + msg[len(commands['announce'])+1:] + '"')
+
+                    if msg.startswith(commands['config']):
+                        file = msg.split(" ")[1]
+                        rest = msg[len( commands['announce']) + len(file):]
+                        prop = rest.split("=")[0]
+                        oldval = " "
+                        oldline = " "
+                        newline = ""
+                        val  = rest[len(rest.split("=")[1])+1:]
+
+                        with open(file, "r") as f: 
+                            config = f.readlines()
+
+                        for line_index, lines in enumerate(config):
+                            if lines.split("=")[0] == prop:
+                                oldval = lines.split("=")[1]
+                                oldline = lines
+                                newline = (prop+"="+val.split("=")[1]+"\n")
+                                config[line_index] = newline
+
+                        with open(file, "w") as f: 
+                            f.writelines(config)
+                            await message.channel.send("Config file `" + file + "` updated property `" + prop + "`. changed value `" + oldval + "` to `" + val.split("=")[1] + "`")
+
+                        await log(commands['config'] + " command used", str(message.author), "MED")
+                        
+                    if msg.startswith(commands['help']):
+                        await log(commands['help'] + " command used", str(message.author), "LOW")
+                        await message.channel.send(
+                            "`"+prefix + "reload` Restarts the bot component" + "\n" +
+                            "`"+prefix + "start` Starts the cloth server" + "\n" +
+                            "`"+prefix + "restart` Restarts the cloth server" + "\n" +
+                            "`"+prefix + "update` Shuts down the cloth server, pulls latest release of cloth, and starts it again" + "\n" +
+                            "`"+prefix + "stop` Stops the cloth server" + "\n" +
+                            "`"+prefix + "wipe <username>` wipes the playerdata and restarts server" + "\n" +
+                            "`"+prefix + "announce <text>` will do a say command (eventualy)" + "\n" +
+                            "`"+prefix + "config <property.file> <property=newvalue>` updates a property in a file" + "\n" +
+                            "`"+prefix + "help` take a wild fuckin guess buddy" + "\n")
 
                 except Exception as e: # returns error meesages to discord in a python codeblock for debugging
                     print(traceback.format_exc())
