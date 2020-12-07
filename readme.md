@@ -1,54 +1,45 @@
 # My Scripts
 
-Hi, I'm Eli. Here are some scripts and config files for my systems. These are kept mostly intact from how I normally use them, so if you want to use them, it may take some tweaking for specific directories and removed credentials if applicable, but there is some useful stuff in here...
+Hi! I'm Robin. I make a lot of really small things to help me in my day-to-day, and I've found that fairly often, coming across random repos full of small scripts can mean the difference between an afternoon of work and being able to just get something done, so I like to release all of the small scripts I do under the (Do What the Fuck You Want to Public License)[http://www.wtfpl.net/about/]
 
+## Darker - Graphics
+This is a GIMP theme that makes gimp darker. It also gets rid of (hides) the mascot in the background for a more clean look
 
+## PurgeBot - Python
+This is a simple python discord bot that wipes up to 14 days worth of messages from a given channel
 
-## obs-control
+## asm test - Assembly
+Just me noodling around with assembly. Not much here
 
-This hooks into the Web Request plugin API for OBS, and can be used to control OBS locally or potentially over a network ( untested! ) Currently, only scene and profile switching is supported since that's what I needed it for
+## blur - Python
+This is a script to allow you to easily assign KDE blur to chosen window, using devilspie
 
-`obs-ctrl --scene Webcam`
+## clipdl - Bash
+This is a bash script that when activated, will take any link in your clipboard, try to figure out what site it's from, and try to download it to the appropriate folder, ie., downloading soundcloud links as mp3s, twitter links as videos, weird twitter image links as jpegs, etc., etc.,
 
-Needs: **python, obswsrc, asyncio, argparse** 
+## mc-afk-fisher - Bash
+Basically just a simple bash / xdotool script that lets you use an AFK fish farm in minecraft more easily while freeing up your mouse to do other stuff
 
-## spotify-to-discord
+## minecraft-server-management - Bash + Python
+This is a big load of scripts that I use to manage my minecraft servers easily, and it includes my cloth teset server management script, which has a LOT of functionality, but for now is a bit too focused on cloth specifically. I do plan on making it generic and releasing it as it's own project, some day
 
-This uses dbus to capture the currently playing artist and track name, searches for that on Youtube, and posts the first result to discord using [Discho](https://github.com/Evshaddock/discho)
+## notify - Bash
+This is kinda specific, but basically it's a tool made to watch a folder, and when a new file appears, send a message to discord using my other project, Discho. This has a few paths and messages specific to my machine, but it can be easily tweaked to work for other stuff
 
-Needs: **python, jq, discho, python-dbus**
+## obs-control - Python
+This is a basic CLI interface for OBS Web Requests, mostly for use in scripts. it allows you to programatically change the current scene and profile in OBS
 
-## mc-afk-fisher
+## scrcpy-netscan - Bash
+This is made to be a utility for using scrcpy on new / unknown networks quickly. You feed it the MAC address of your device, and it attempts to scan the network for the IP of your device, before attempting to connect you to it via scrcpy
 
-Finds the Minecraft window ID and sends it a continuous right click to allow you to AFK fish while using your system for other things
+## spotify-to-discord - Bash
+This script is likely borked by now, due to changes in the youtube api, but it basically attempts to find out what song you're listening to on spotify on youtube, and then links that youtube video to discord using Discho
 
-Needs: **xdotool**
+## surface-pro-2-rotate - Bash + Python
+This is a script made to enable automatic rotation detection on the surface pro 2, including orientating the touch matrix correctly. It works as a toggle, so running the bash script will lock and unlock automatic orientation detection
+
+## tvname - Python
+Basically just a simple script that will loop through and create a list of "Series eXXsXX" strings based on what input you give it, ie `the Legend Of Korra 24 24 32` will print out a list of names for 3 seasons of the show, the first 2 24 episodes long, and the last one 32 episodes long. I wrote this because naming episodes when ripping box sets of DVDs is a huge pain
 
 ## twitch-chat-reader
-
-This ones a bit more complicated as it's a little bit of a multitasker. here are its main functions..
-
-- Display each message sent in a stream text chat in the terminal window with randomized name colors
-- Read out each message using a random per-user voice using [Acapyla](https://github.com/maddoxdragon/acapyla)
-- Read the currently playing Spotify track, and write it to a file every time a new track starts (to show OBS)
-- Automatically censor slurs and especially naughty words using a word block list
-
-and probably some other bits and bobs. This one has a lot of hard-coded directories, so it will take some tweaking to get working on your end, and it kind of relies on an exploit of a website for the audio to work at all, so it could actually just blow up at any moment. use at your own discretion
-
-Needs: **python, twitch, wordfilter, Spotify** (it has to be running before you start the script), **gi, SoX**, probably other stuff. just keep starting it and installing things until it stops complaining lmfao
-
-## tvname
-
-Will generate a list of [Name] [S] [E] names in a list for easy copy and pasting into handbrake. Recommend moving to /usr/bin for easy systemwide use
-
-`tvname "Avatar: The Last Airbender" 20 20 21 > log.txt`
-
-Needs: **Python**
-
-## notify
-
-Will monitor a directory for newly created .m4v files, and when one is spotted, post it to discord to the 'movie-rips' channel with the message "Now Ripping: [filename]" using Discho. Directories are read recursively, so anything below the path specified will be watched
-
-`./notify.sh [PATH]`
-
-Needs: **Python, Discho**
+This is mostly useless now, but back when it worked it would basically output a pretty looking twitch chat to your terminal, it would also read out the text using a exploit in acapella group's text to speech service
