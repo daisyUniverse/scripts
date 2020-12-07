@@ -1,6 +1,6 @@
 # My Scripts
 
-Hi! I'm Robin. I make a lot of really small things to help me in my day-to-day, and I've found that fairly often, coming across random repos full of small scripts can mean the difference between an afternoon of work and being able to just get something done, so I like to release all of the small scripts I do under the (Do What the Fuck You Want to Public License)[http://www.wtfpl.net/about/]
+Hi! I'm Robin. I make a lot of really small things to help me in my day-to-day, and I've found that fairly often, coming across random repos full of small scripts can mean the difference between an afternoon of work and being able to just get something done, so I like to release all of the small scripts I do under the [Do What the Fuck You Want to Public License](http://www.wtfpl.net/about/)
 
 ## Darker - Graphics
 This is a GIMP theme that makes gimp darker. It also gets rid of (hides) the mascot in the background for a more clean look
@@ -21,7 +21,7 @@ This is a bash script that when activated, will take any link in your clipboard,
 Basically just a simple bash / xdotool script that lets you use an AFK fish farm in minecraft more easily while freeing up your mouse to do other stuff
 
 ## minecraft-server-management - Bash + Python
-This is a big load of scripts that I use to manage my minecraft servers easily, and it includes my cloth teset server management script, which has a LOT of functionality, but for now is a bit too focused on cloth specifically. I do plan on making it generic and releasing it as it's own project, some day
+This is a big load of scripts that I use to manage my minecraft servers easily, and it includes my cloth test server management script, which has a LOT of functionality, but for now is a bit too focused on cloth specifically. I do plan on making it generic and releasing it as it's own project, some day
 
 ## notify - Bash
 This is kinda specific, but basically it's a tool made to watch a folder, and when a new file appears, send a message to discord using my other project, Discho. This has a few paths and messages specific to my machine, but it can be easily tweaked to work for other stuff
